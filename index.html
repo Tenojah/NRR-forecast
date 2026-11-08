@@ -159,6 +159,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
       <div class="formula">
         <b>NRR = GRR + expansion rate</b>
         <span>Horizon: 12 months. Existing customers only, new logos excluded.</span>
+        <span style="display:block;margin-top:6px">GRR is capped at 100%. NRR can go above 100% when expansion outweighs churn.</span>
       </div>
 
       <p class="hint" style="margin:0 0 16px">Prudent: GRR −3 pts, expansion −4 pts. Ambitious: GRR +3 pts (capped at 100%), expansion +6 pts.</p>
@@ -219,7 +220,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
         <div class="pt"><span>Share of ARR renewing within 120 days</span><b id="ptR">–</b></div>
         <div class="pt"><span>Expected loss on those renewals at base GRR</span><b id="ptL">–</b></div>
         <div class="say" id="say">–</div>
-        <p class="method">The renewal loss is an approximation: it applies the base GRR to the ARR renewing in the window.</p>
+        <p class="method">GRR is capped at 100%, expansion is not. The renewal loss is an approximation: it applies the base GRR to the ARR renewing in the window.</p>
       </div>
     </div>
 
@@ -293,14 +294,17 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
   }
 
   function fmtMoney(v) {
-    var a = Math.abs(v);
-    var s = a >= 1000000 ? "€" + (a / 1000000).toFixed(2) + "M" : "€" + Math.round(a / 1000) + "k";
-    return (v < 0 && Math.round(a / 1000) > 0 ? MINUS : "") + s;
+    var a = Math.abs(v), s;
+    if (a >= 1000000) s = "€" + (a / 1000000).toFixed(2) + "M";
+    else if (a >= 10000) s = "€" + Math.round(a / 1000) + "k";
+    else if (a >= 1000) s = "€" + (a / 1000).toFixed(1) + "k";
+    else s = "€" + Math.round(a);
+    return (v < 0 && Math.round(a) > 0 ? MINUS : "") + s;
   }
 
   function fmtSigned(v) {
     var a = Math.abs(v);
-    if (a < 500) return "€0k";
+    if (Math.round(a) === 0) return "€0";
     return (v > 0 ? "+" : MINUS) + fmtMoney(a);
   }
 
@@ -368,7 +372,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     bar("b2", kept / ymax * 100, b.expansion / ymax * 100);
     bar("b3", 0, b.end / ymax * 100);
     set("v0", fmtMoney(arr));
-    set("v1", b.churn > 0 ? MINUS + fmtMoney(b.churn) : "€0k");
+    set("v1", b.churn > 0 ? MINUS + fmtMoney(b.churn) : "€0");
     set("v2", "+" + fmtMoney(b.expansion));
     set("v3", fmtMoney(b.end));
     $("chart").setAttribute("aria-label",
@@ -376,7 +380,8 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
       fmtMoney(b.churn) + ", expansion " + fmtMoney(b.expansion) + ", ARR in 12 months " + fmtMoney(b.end) + ".");
 
     var pv = pointValue(arr);
-    set("ptG", "+" + fmtMoney(pv));
+    var grrMaxed = state.grr >= 100;
+    set("ptG", grrMaxed ? "Already 100%" : "+" + fmtMoney(pv));
     set("ptE", "+" + fmtMoney(pv));
     var rx = renewalExposure(arr, state.ren, state.grr);
     set("ptR", fmtPct(rx.share));
@@ -387,8 +392,11 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     var strong = document.createElement("b");
     strong.textContent = "Executive committee line: ";
     say.appendChild(strong);
+    var lead = grrMaxed
+      ? "retention is already at its 100% ceiling, so growth has to come from expansion: each point of expansion is worth about " + fmtMoney(pv) + " of ARR on this portfolio. "
+      : "each point of retention is worth about " + fmtMoney(pv) + " of ARR on this portfolio. ";
     say.appendChild(document.createTextNode(
-      "each point of retention is worth about " + fmtMoney(pv) + " of ARR on this portfolio. " +
+      lead +
       "In the base case, NRR is " + fmtPct(b.nrr) + " and ARR from existing customers reaches " + fmtMoney(b.end) + "."));
 
     lastSummary =
@@ -397,7 +405,9 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
       "Base: NRR " + fmtPct(b.nrr) + ", ARR " + fmtMoney(b.end) + " (" + fmtSigned(b.delta) + "). " +
       "Prudent: NRR " + fmtPct(sc.prudent.nrr) + ", ARR " + fmtMoney(sc.prudent.end) + ". " +
       "Ambitious: NRR " + fmtPct(sc.ambitious.nrr) + ", ARR " + fmtMoney(sc.ambitious.end) + ". " +
-      "One point of retention is worth about " + fmtMoney(pv) + " of ARR.";
+      (grrMaxed
+        ? "Retention is at its 100% ceiling; one point of expansion is worth about " + fmtMoney(pv) + " of ARR."
+        : "One point of retention is worth about " + fmtMoney(pv) + " of ARR.");
   }
 
   function readInputs(showOk) {
@@ -412,6 +422,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     if (String(renRaw).trim() === "") { ren = 0; }
     else if (isNaN(ren)) { ren = 0; note = "Renewing ARR not understood: counted as zero."; }
     else if (ren > arr) { ren = arr; note = "Renewing ARR cannot exceed total ARR: capped."; }
+    if (arr < 1000) note = "Starting ARR is under €1,000. Amounts are in euros: type 4.8M or 4800000 for €4.8M.";
     state.arr = arr;
     state.ren = ren;
     state.grr = Number($("grr").value);

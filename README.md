@@ -9,7 +9,7 @@ A CS Lab tool: turn one point of retention or expansion into euros of ARR, acros
 - **Expansion**: upsell and cross-sell, as a share of starting ARR.
 - **ARR in 12 months** = starting ARR × NRR.
 - **Scenarios**: Base uses your inputs. Prudent is GRR −3 pts and expansion −4 pts. Ambitious is GRR +3 pts (capped at 100%) and expansion +6 pts.
-- **What one point is worth**: 1% of starting ARR, for GRR and for expansion.
+- **What one point is worth**: 1% of starting ARR, for GRR and for expansion. GRR cannot exceed 100%, so its lever is shown as "Already 100%" once the ceiling is reached; expansion has no cap, which is why NRR can go above 100%.
 - **Renewal loss** is an approximation: it applies the base GRR to the ARR renewing within 120 days.
 - Default figures are illustrative.
 
