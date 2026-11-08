@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NRR Forecast Simulator</title>
+<meta name="description" content="Turn one point of retention or expansion into euros of ARR, across three scenarios. Your numbers stay in your browser.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --red:#DA291C;
+  --gold:#FBE122;
+  --black:#000000;
+  --ink:#111111;
+  --muted:#55555A;
+  --bg:#F5F5F3;
+  --panel:#FFFFFF;
+  --line:#DADAD6;
+}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+.wrap{max-width:1360px;margin:0 auto;padding:0 16px}
+@media(min-width:720px){.wrap{padding:0 40px}}
+header.band{background:var(--black);color:#FFFFFF;border-bottom:6px solid var(--red);padding:32px 0 28px}
+header.band .row{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:flex-start}
+.eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
+h1{font-family:'Space Grotesk','Inter',sans-serif;font-size:clamp(28px,4vw,38px);line-height:1.1;letter-spacing:-.02em;margin:0 0 8px}
+.sub{margin:0;color:#D0D0D0;font-size:15px;max-width:62ch}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.tag{font-size:13px;font-weight:600;color:var(--gold);border:1px solid var(--gold);padding:7px 14px;border-radius:999px}
+.btn{font-family:inherit;font-size:14px;font-weight:600;min-height:44px;padding:0 20px;border-radius:8px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;border:2px solid var(--ink);color:var(--ink);background:transparent}
+.btn.primary{background:var(--red);border-color:var(--red);color:#FFFFFF}
+.btn:hover{filter:brightness(.93)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+header.band :focus-visible{outline-color:var(--gold)}
+main.wrap{padding-top:28px;padding-bottom:56px}
+.howto{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:0 22px;margin:0 0 20px}
+.howto summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-size:16px;font-weight:600}
+.howto ol{margin:0 0 18px;padding-left:22px;display:grid;gap:8px;font-size:14px;color:var(--muted)}
+.howto li b{color:var(--ink)}
+#msg{min-height:22px;font-size:14px;margin:0 0 12px;font-weight:600}
+#msg.err{color:var(--red)}
+#msg.ok{color:var(--ink)}
+.layout{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+aside.panel{flex:0 0 340px;max-width:100%;width:100%}
+@media(min-width:1000px){aside.panel{width:340px}}
+section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;gap:20px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
+.card h2{font-size:16px;font-weight:600;margin:0 0 16px}
+.field{margin-bottom:18px}
+.field .row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
+.field .row b{font-variant-numeric:tabular-nums}
+.field input[type=text]{width:100%;min-height:44px;font-family:inherit;font-size:16px;font-weight:600;padding:0 14px;color:var(--ink);background:#FFFFFF;border:1px solid #9A9A95;border-radius:8px}
+.field input[type=range]{width:100%;accent-color:var(--red);min-height:24px}
+.hint{font-size:13px;color:var(--muted);margin:6px 0 0}
+.formula{background:var(--bg);border-left:6px solid var(--gold);border-radius:6px;padding:14px 16px;margin:6px 0 18px}
+.formula b{display:block;font-size:14px;margin-bottom:4px}
+.formula span{font-size:13px;color:var(--muted)}
+.scen{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.sc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
+.sc.base{border:3px solid var(--red);padding:16px 18px}
+.sc .n{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.sc .big{font-family:'Space Grotesk','Inter',sans-serif;font-size:36px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sc .mix{font-size:13px;color:var(--muted)}
+.sc .arr{font-size:14px;margin-top:6px}
+.sc .arr b{font-variant-numeric:tabular-nums}
+.sc .d{font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+.d.neg{color:var(--red)}
+.d.pos{color:var(--ink)}
+.cols{display:flex;flex-wrap:wrap;gap:20px}
+.cols>.card{flex:1 1 320px;min-width:0}
+.cols>.card.wide{flex:1.4 1 420px}
+.plot{position:relative;height:250px;display:flex;gap:16px;border-bottom:2px solid var(--ink);margin-top:6px}
+.col{flex:1;position:relative;height:100%}
+.bar{position:absolute;left:12%;right:12%;border-radius:4px 4px 0 0}
+.bar.total{background:var(--ink)}
+.bar.loss{background:var(--red)}
+.bar.gain{background:var(--gold);border:2px solid var(--ink)}
+.vals,.cats{display:flex;gap:16px}
+.vals{margin-bottom:6px}
+.vals div,.cats div{flex:1;text-align:center}
+.vals div{font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.vals .neg{color:var(--red)}
+.cats{margin-top:8px}
+.cats div{font-size:13px;color:var(--muted)}
+.pt{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.pt span{font-size:14px}
+.pt b{font-family:'Space Grotesk','Inter',sans-serif;font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pt:last-of-type{border-bottom:0}
+.say{background:var(--black);color:#FFFFFF;border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.5;margin-top:10px}
+.say b{color:var(--gold)}
+.privacy{font-size:13px;color:var(--muted);margin:24px 0 0}
+.method{font-size:13px;color:var(--muted);margin:14px 0 0}
+</style>
+</head>
+<body>
+
+<header class="band">
+  <div class="wrap">
+    <div class="row">
+      <div>
+        <p class="eyebrow">CS Lab · Tool 2</p>
+        <h1>NRR Forecast Simulator</h1>
+        <p class="sub">Turn one point of retention or expansion into euros of ARR, across three scenarios.</p>
+      </div>
+      <div class="actions">
+        <span class="tag">Illustrative defaults · edit them</span>
+        <button class="btn primary" id="copyBtn" type="button">Copy summary</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<details class="howto" open>
+  <summary>How to use the tool (30 seconds)</summary>
+  <ol>
+    <li><b>Enter your base.</b> Starting ARR from existing customers, and the ARR renewing in the next 120 days. You can type 4.8M, 4800000 or 4,800,000.</li>
+    <li><b>Set your base case.</b> GRR is the share of starting ARR you keep after churn and downgrades. Expansion is upsell and cross-sell, as a share of starting ARR.</li>
+    <li><b>Compare three scenarios.</b> Prudent, Base and Ambitious show NRR and ARR in 12 months. The bridge explains where the movement comes from.</li>
+    <li><b>Prepare the message.</b> Use "What one point is worth" for the executive committee, then copy the summary.</li>
+  </ol>
+</details>
+
+<p id="msg" role="status" aria-live="polite"></p>
+
+<div class="layout">
+  <aside class="panel">
+    <div class="card">
+      <h2>Starting assumptions</h2>
+
+      <div class="field">
+        <label for="arr" style="font-size:14px;display:block;margin-bottom:6px">Starting ARR (existing customers)</label>
+        <input id="arr" type="text" inputmode="decimal" autocomplete="off" value="4,800,000">
+        <p class="hint">Euros. Try 4.8M or 4800000.</p>
+      </div>
+
+      <div class="field">
+        <div class="row"><label for="grr">GRR (gross revenue retention)</label><b id="grrV">90%</b></div>
+        <input id="grr" type="range" min="70" max="100" step="1" value="90">
+        <p class="hint">Share of starting ARR kept after churn and downgrades, before any upsell.</p>
+      </div>
+
+      <div class="field">
+        <div class="row"><label for="exp">Expansion (upsell and cross-sell)</label><b id="expV">12%</b></div>
+        <input id="exp" type="range" min="0" max="30" step="1" value="12">
+        <p class="hint">Extra ARR from existing customers, as a share of starting ARR.</p>
+      </div>
+
+      <div class="field">
+        <label for="ren" style="font-size:14px;display:block;margin-bottom:6px">ARR renewing in the next 120 days</label>
+        <input id="ren" type="text" inputmode="decimal" autocomplete="off" value="1,350,000">
+      </div>
+
+      <div class="formula">
+        <b>NRR = GRR + expansion rate</b>
+        <span>Horizon: 12 months. Existing customers only, new logos excluded.</span>
+      </div>
+
+      <p class="hint" style="margin:0 0 16px">Prudent: GRR −3 pts, expansion −4 pts. Ambitious: GRR +3 pts (capped at 100%), expansion +6 pts.</p>
+      <button class="btn" id="resetBtn" type="button">Reset</button>
+    </div>
+  </aside>
+
+  <section class="results" aria-label="Results">
+
+    <div class="scen">
+      <div class="sc">
+        <div class="n">Prudent</div>
+        <div class="big" id="pNrr">–</div>
+        <div class="mix" id="pMix">–</div>
+        <div class="arr">ARR in 12 months: <b id="pArr">–</b></div>
+        <div class="d" id="pD">–</div>
+      </div>
+      <div class="sc base">
+        <div class="n" style="color:var(--red)">Base</div>
+        <div class="big" id="bNrr">–</div>
+        <div class="mix" id="bMix">–</div>
+        <div class="arr">ARR in 12 months: <b id="bArr">–</b></div>
+        <div class="d" id="bD">–</div>
+      </div>
+      <div class="sc">
+        <div class="n">Ambitious</div>
+        <div class="big" id="aNrr">–</div>
+        <div class="mix" id="aMix">–</div>
+        <div class="arr">ARR in 12 months: <b id="aArr">–</b></div>
+        <div class="d" id="aD">–</div>
+      </div>
+    </div>
+
+    <div class="cols">
+      <div class="card wide">
+        <h2>ARR bridge: base scenario</h2>
+        <div id="chart" role="img" aria-label="ARR bridge">
+          <div class="vals" aria-hidden="true">
+            <div id="v0">–</div><div id="v1" class="neg">–</div><div id="v2">–</div><div id="v3">–</div>
+          </div>
+          <div class="plot" aria-hidden="true">
+            <div class="col"><div class="bar total" id="b0"></div></div>
+            <div class="col"><div class="bar loss" id="b1"></div></div>
+            <div class="col"><div class="bar gain" id="b2"></div></div>
+            <div class="col"><div class="bar total" id="b3"></div></div>
+          </div>
+          <div class="cats" aria-hidden="true">
+            <div>Starting ARR</div><div>Churn and downgrades</div><div>Expansion</div><div>ARR in 12 months</div>
+          </div>
+        </div>
+        <p class="method">Existing customers only. New logos are not included in this bridge.</p>
+      </div>
+
+      <div class="card">
+        <h2>What one point is worth</h2>
+        <div class="pt"><span>+1 pt of GRR</span><b id="ptG">–</b></div>
+        <div class="pt"><span>+1 pt of expansion</span><b id="ptE">–</b></div>
+        <div class="pt"><span>Share of ARR renewing within 120 days</span><b id="ptR">–</b></div>
+        <div class="pt"><span>Expected loss on those renewals at base GRR</span><b id="ptL">–</b></div>
+        <div class="say" id="say">–</div>
+        <p class="method">The renewal loss is an approximation: it applies the base GRR to the ARR renewing in the window.</p>
+      </div>
+    </div>
+
+  </section>
+</div>
+
+<p class="privacy">Your numbers never leave your browser: nothing is sent to a server. Default figures are illustrative.</p>
+</main>
+
+<script>
+(function (root) {
+  "use strict";
+
+  var DEFAULTS = { arr: 4800000, grr: 90, exp: 12, ren: 1350000 };
+  var SPREAD = {
+    prudent: { grr: -3, exp: -4 },
+    ambitious: { grr: 3, exp: 6 }
+  };
+  var MINUS = "−";
+
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  // Accepts "4,800,000", "4 800 000", "4.8M", "4,8M", "4800k", "4.800.000", "EUR 1 350 000".
+  function parseAmount(raw) {
+    var s = String(raw === null || raw === undefined ? "" : raw).trim().toLowerCase();
+    s = s.replace(/[€\s_]/g, "").replace(/^eur/, "");
+    if (s === "") return NaN;
+    var mult = 1;
+    var last = s.charAt(s.length - 1);
+    var hasSuffix = false;
+    if (last === "m") { mult = 1000000; hasSuffix = true; s = s.slice(0, -1); }
+    else if (last === "k") { mult = 1000; hasSuffix = true; s = s.slice(0, -1); }
+    var commas = (s.match(/,/g) || []).length;
+    var dots = (s.match(/\./g) || []).length;
+    if (hasSuffix) {
+      if (commas === 1 && dots === 0) s = s.replace(",", ".");
+      else s = s.replace(/,/g, "");
+    } else if (commas > 0 && dots === 0) {
+      if (/^\d{1,3}(,\d{3})+$/.test(s)) s = s.replace(/,/g, "");
+    } else if (commas > 0 && dots === 1) {
+      if (/^\d{1,3}(,\d{3})+\.\d+$/.test(s)) s = s.replace(/,/g, "");
+    } else if (dots > 1 && commas === 0) {
+      if (/^\d{1,3}(\.\d{3})+$/.test(s)) s = s.replace(/\./g, "");
+    } else if (dots === 1 && commas === 0 && /^\d{1,3}\.\d{3}$/.test(s)) {
+      s = s.replace(".", "");
+    }
+    if (!/^\d+(\.\d+)?$/.test(s)) return NaN;
+    var n = parseFloat(s) * mult;
+    return isFinite(n) ? n : NaN;
+  }
+
+  function scenario(arr, grr, exp) {
+    var g = clamp(grr, 0, 100);
+    var e = Math.max(0, exp);
+    var churn = arr * (100 - g) / 100;
+    var expansion = arr * e / 100;
+    return {
+      grr: g, exp: e, nrr: g + e,
+      churn: churn, expansion: expansion,
+      end: arr - churn + expansion,
+      delta: expansion - churn
+    };
+  }
+
+  function scenarios(arr, grr, exp) {
+    return {
+      prudent: scenario(arr, grr + SPREAD.prudent.grr, exp + SPREAD.prudent.exp),
+      base: scenario(arr, grr, exp),
+      ambitious: scenario(arr, grr + SPREAD.ambitious.grr, exp + SPREAD.ambitious.exp)
+    };
+  }
+
+  function fmtMoney(v) {
+    var a = Math.abs(v);
+    var s = a >= 1000000 ? "€" + (a / 1000000).toFixed(2) + "M" : "€" + Math.round(a / 1000) + "k";
+    return (v < 0 && Math.round(a / 1000) > 0 ? MINUS : "") + s;
+  }
+
+  function fmtSigned(v) {
+    var a = Math.abs(v);
+    if (a < 500) return "€0k";
+    return (v > 0 ? "+" : MINUS) + fmtMoney(a);
+  }
+
+  function fmtPct(v) { return String(Math.round(v * 10) / 10) + "%"; }
+
+  function fmtInput(n) {
+    return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  }
+
+  function pointValue(arr) { return arr / 100; }
+
+  function renewalExposure(arr, ren, grr) {
+    var r = clamp(ren, 0, arr);
+    return { share: arr > 0 ? r / arr * 100 : 0, loss: r * (100 - clamp(grr, 0, 100)) / 100 };
+  }
+
+  var api = {
+    DEFAULTS: DEFAULTS, parseAmount: parseAmount, scenario: scenario, scenarios: scenarios,
+    fmtMoney: fmtMoney, fmtSigned: fmtSigned, fmtPct: fmtPct, fmtInput: fmtInput,
+    pointValue: pointValue, renewalExposure: renewalExposure, clamp: clamp
+  };
+
+  if (typeof module !== "undefined" && module.exports) { module.exports = api; }
+  if (typeof document === "undefined") return;
+
+  function $(id) { return document.getElementById(id); }
+  function set(id, text) { $(id).textContent = text; }
+
+  var state = { arr: DEFAULTS.arr, grr: DEFAULTS.grr, exp: DEFAULTS.exp, ren: DEFAULTS.ren };
+  var lastSummary = "";
+
+  function setMsg(text, kind) {
+    var m = $("msg");
+    m.textContent = text || "";
+    m.className = kind || "";
+  }
+
+  function fillScenario(prefix, sc) {
+    set(prefix + "Nrr", fmtPct(sc.nrr));
+    set(prefix + "Mix", "GRR " + fmtPct(sc.grr) + " · expansion " + fmtPct(sc.exp));
+    set(prefix + "Arr", fmtMoney(sc.end));
+    var d = $(prefix + "D");
+    d.textContent = fmtSigned(sc.delta) + " vs start";
+    d.className = "d " + (sc.delta < -500 ? "neg" : "pos");
+  }
+
+  function bar(id, bottomPct, heightPct) {
+    var el = $(id);
+    el.style.bottom = bottomPct + "%";
+    el.style.height = (heightPct > 0 ? Math.max(heightPct, 0.8) : 0) + "%";
+  }
+
+  function render() {
+    var arr = state.arr;
+    var sc = scenarios(arr, state.grr, state.exp);
+    fillScenario("p", sc.prudent);
+    fillScenario("b", sc.base);
+    fillScenario("a", sc.ambitious);
+
+    var b = sc.base;
+    var ymax = Math.max(arr, b.end) * 1.1;
+    var kept = arr - b.churn;
+    bar("b0", 0, arr / ymax * 100);
+    bar("b1", kept / ymax * 100, b.churn / ymax * 100);
+    bar("b2", kept / ymax * 100, b.expansion / ymax * 100);
+    bar("b3", 0, b.end / ymax * 100);
+    set("v0", fmtMoney(arr));
+    set("v1", b.churn > 0 ? MINUS + fmtMoney(b.churn) : "€0k");
+    set("v2", "+" + fmtMoney(b.expansion));
+    set("v3", fmtMoney(b.end));
+    $("chart").setAttribute("aria-label",
+      "ARR bridge, base scenario: starting ARR " + fmtMoney(arr) + ", churn and downgrades " +
+      fmtMoney(b.churn) + ", expansion " + fmtMoney(b.expansion) + ", ARR in 12 months " + fmtMoney(b.end) + ".");
+
+    var pv = pointValue(arr);
+    set("ptG", "+" + fmtMoney(pv));
+    set("ptE", "+" + fmtMoney(pv));
+    var rx = renewalExposure(arr, state.ren, state.grr);
+    set("ptR", fmtPct(rx.share));
+    set("ptL", fmtMoney(rx.loss));
+
+    var say = $("say");
+    say.replaceChildren();
+    var strong = document.createElement("b");
+    strong.textContent = "Executive committee line: ";
+    say.appendChild(strong);
+    say.appendChild(document.createTextNode(
+      "each point of retention is worth about " + fmtMoney(pv) + " of ARR on this portfolio. " +
+      "In the base case, NRR is " + fmtPct(b.nrr) + " and ARR from existing customers reaches " + fmtMoney(b.end) + "."));
+
+    lastSummary =
+      "NRR forecast (12 months, existing customers only). Starting ARR " + fmtMoney(arr) +
+      ", GRR " + fmtPct(state.grr) + ", expansion " + fmtPct(state.exp) + ". " +
+      "Base: NRR " + fmtPct(b.nrr) + ", ARR " + fmtMoney(b.end) + " (" + fmtSigned(b.delta) + "). " +
+      "Prudent: NRR " + fmtPct(sc.prudent.nrr) + ", ARR " + fmtMoney(sc.prudent.end) + ". " +
+      "Ambitious: NRR " + fmtPct(sc.ambitious.nrr) + ", ARR " + fmtMoney(sc.ambitious.end) + ". " +
+      "One point of retention is worth about " + fmtMoney(pv) + " of ARR.";
+  }
+
+  function readInputs(showOk) {
+    var arr = parseAmount($("arr").value);
+    if (!(arr > 0)) {
+      setMsg("Enter a starting ARR above zero, for example 4.8M.", "err");
+      return false;
+    }
+    var renRaw = $("ren").value;
+    var ren = parseAmount(renRaw);
+    var note = "";
+    if (String(renRaw).trim() === "") { ren = 0; }
+    else if (isNaN(ren)) { ren = 0; note = "Renewing ARR not understood: counted as zero."; }
+    else if (ren > arr) { ren = arr; note = "Renewing ARR cannot exceed total ARR: capped."; }
+    state.arr = arr;
+    state.ren = ren;
+    state.grr = Number($("grr").value);
+    state.exp = Number($("exp").value);
+    set("grrV", state.grr + "%");
+    set("expV", state.exp + "%");
+    if (note) setMsg(note, "err");
+    else setMsg(showOk || "", showOk ? "ok" : "");
+    return true;
+  }
+
+  function onChange() {
+    if (readInputs()) render();
+  }
+
+  function reformat(id) {
+    var n = parseAmount($(id).value);
+    if (n >= 0) $(id).value = fmtInput(n);
+  }
+
+  function copySummary() {
+    if (!lastSummary) return;
+    var done = function () { setMsg("Summary copied to the clipboard.", "ok"); };
+    var fail = function () { setMsg("Copy is not available in this browser: select the text from the page instead.", "err"); };
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(lastSummary).then(done, fail);
+      } else { fail(); }
+    } catch (e) { fail(); }
+  }
+
+  function reset() {
+    $("arr").value = fmtInput(DEFAULTS.arr);
+    $("ren").value = fmtInput(DEFAULTS.ren);
+    $("grr").value = String(DEFAULTS.grr);
+    $("exp").value = String(DEFAULTS.exp);
+    setMsg("", "");
+    onChange();
+  }
+
+  $("arr").addEventListener("input", onChange);
+  $("ren").addEventListener("input", onChange);
+  $("arr").addEventListener("change", function () { reformat("arr"); });
+  $("ren").addEventListener("change", function () { reformat("ren"); });
+  $("grr").addEventListener("input", onChange);
+  $("exp").addEventListener("input", onChange);
+  $("copyBtn").addEventListener("click", copySummary);
+  $("resetBtn").addEventListener("click", reset);
+  onChange();
+})(this);
+</script>
+</body>
+</html>
