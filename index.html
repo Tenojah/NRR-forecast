@@ -398,8 +398,9 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     set("ptE", "+" + fmtMoney(pv));
     var gap = gapToCeiling(arr, state.grr);
     if (b.churn > 0) {
-      set("ptCov", Math.round(b.expansion / b.churn * 100) + "%");
-      set("ptCovL", fmtMoney(b.expansion) + " of upsell against " + fmtMoney(b.churn) + " lost" + (b.expansion >= b.churn ? ": fully covered" : ": not covered"));
+      var net = b.expansion - b.churn;
+      set("ptCov", fmtMoney(b.expansion) + " · " + Math.round(b.expansion / b.churn * 100) + "%");
+      set("ptCovL", "Upsell against " + fmtMoney(b.churn) + " lost: " + (net >= 0 ? "covered, net " + fmtSigned(net) : "not covered, " + fmtMoney(-net) + " short"));
     } else {
       set("ptCov", "n/a");
       set("ptCovL", "No ARR lost, nothing to compensate");
