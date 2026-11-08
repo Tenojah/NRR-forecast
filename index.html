@@ -105,6 +105,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 .pt span{font-size:14px}
 .pt b{font-family:'Space Grotesk','Inter',sans-serif;font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .pt b.neg{color:var(--red)}
+.pt b.pos{color:#1B7F3B}
 .pt span small{display:block;font-size:12px;opacity:.65;margin-top:2px}
 .lede{font-size:13px;opacity:.75;margin:0 0 4px}
 .pt:last-of-type{border-bottom:0}
@@ -434,10 +435,12 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     var gap = gapToCeiling(arr, state.grr);
     if (b.churn > 0) {
       var net = b.expansion - b.churn;
-      set("ptCov", fmtMoney(b.expansion) + " · " + Math.round(b.expansion / b.churn * 100) + "%");
-      set("ptCovL", "Upsell against " + fmtMoney(b.churn) + " lost: " + (net >= 0 ? "covered, net " + fmtSigned(net) : "not covered, " + fmtMoney(-net) + " short"));
+      set("ptCov", fmtSigned(net));
+      document.getElementById("ptCov").className = net >= 0 ? "pos" : "neg";
+      set("ptCovL", (net >= 0 ? "Covered" : "Not covered") + ": " + fmtMoney(b.expansion) + " of upsell against " + fmtMoney(b.churn) + " lost (" + Math.round(b.expansion / b.churn * 100) + "%)");
     } else {
       set("ptCov", "n/a");
+      document.getElementById("ptCov").className = "";
       set("ptCovL", "No ARR lost, nothing to compensate");
     }
     set("ptGapL", gap.pts > 0 ? "Churn and downgrades: " + gap.pts + " points below 100% retention" : "Churn and downgrades: none, retention is at 100%");
