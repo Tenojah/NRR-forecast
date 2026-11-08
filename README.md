@@ -10,7 +10,7 @@ A CS Lab tool: turn one point of retention or expansion into euros of ARR, acros
 - **ARR in 12 months** = starting ARR × NRR.
 - **Scenarios**: Base uses your inputs. Prudent is GRR −3 pts and expansion −4 pts. Ambitious is GRR +3 pts (capped at 100%) and expansion +6 pts.
 - **What one point is worth**: 1% of starting ARR, for GRR and for expansion. GRR cannot exceed 100%, so its lever is shown as "Already 100%" once the ceiling is reached; expansion has no cap, which is why NRR can go above 100%.
-- **GRR gap to 100%**: the points of retention lost to churn and downgrades, and their value in ARR (starting ARR × gap). It equals the churn bar of the base scenario.
+- **ARR you lose each year today**: the retention points missing to reach 100%, valued in ARR (starting ARR × gap). It equals the churn bar of the base scenario.
 - **Renewal loss** is an approximation: it applies the base GRR to the ARR renewing within 120 days.
 - Default figures are illustrative.
 

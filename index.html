@@ -90,6 +90,8 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 .pt span{font-size:14px}
 .pt b{font-family:'Space Grotesk','Inter',sans-serif;font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .pt b.neg{color:var(--red)}
+.pt span small{display:block;font-size:12px;opacity:.65;margin-top:2px}
+.lede{font-size:13px;opacity:.75;margin:0 0 4px}
 .pt:last-of-type{border-bottom:0}
 .say{background:var(--black);color:#FFFFFF;border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.5;margin-top:10px}
 .say b{color:var(--gold)}
@@ -216,11 +218,12 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 
       <div class="card">
         <h2>What one point is worth</h2>
-        <div class="pt"><span>+1 pt of GRR</span><b id="ptG">–</b></div>
-        <div class="pt"><span id="ptGapL">GRR gap to 100%</span><b class="neg" id="ptGap">–</b></div>
-        <div class="pt"><span>+1 pt of expansion</span><b id="ptE">–</b></div>
-        <div class="pt"><span>Share of ARR renewing within 120 days</span><b id="ptR">–</b></div>
-        <div class="pt"><span>Expected loss on those renewals at base GRR</span><b id="ptL">–</b></div>
+        <p class="lede">A "point" is 1% of your starting ARR. Here is what moving it is worth.</p>
+        <div class="pt"><span>Keep 1% more of your ARR<small id="ptGL">1 point of retention (GRR)</small></span><b id="ptG">–</b></div>
+        <div class="pt"><span>Sell 1% more to existing customers<small>1 point of expansion</small></span><b id="ptE">–</b></div>
+        <div class="pt"><span>ARR you lose each year today<small id="ptGapL">Churn and downgrades</small></span><b class="neg" id="ptGap">–</b></div>
+        <div class="pt"><span>ARR up for renewal in 120 days<small>Share of your total ARR</small></span><b id="ptR">–</b></div>
+        <div class="pt"><span>Likely loss on those renewals<small>If retention stays at your base GRR</small></span><b id="ptL">–</b></div>
         <div class="say" id="say">–</div>
         <p class="method">GRR is capped at 100%, expansion is not. The renewal loss is an approximation: it applies the base GRR to the ARR renewing in the window.</p>
       </div>
@@ -389,11 +392,13 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 
     var pv = pointValue(arr);
     var grrMaxed = state.grr >= 100;
-    set("ptG", grrMaxed ? "Already 100%" : "+" + fmtMoney(pv));
+    set("ptG", grrMaxed ? "Maxed out" : "+" + fmtMoney(pv));
+    set("ptGL", grrMaxed ? "Retention is already at the 100% ceiling" : "1 point of retention (GRR)");
     set("ptE", "+" + fmtMoney(pv));
     var gap = gapToCeiling(arr, state.grr);
-    set("ptGapL", gap.pts > 0 ? "GRR gap to 100% (" + gap.pts + " pts)" : "GRR gap to 100%");
-    set("ptGap", gap.pts > 0 ? MINUS + fmtMoney(gap.value) : "None");
+    set("ptGapL", gap.pts > 0 ? "Churn and downgrades: " + gap.pts + " points below 100% retention" : "Churn and downgrades: none, retention is at 100%");
+    set("ptGap", gap.pts > 0 ? MINUS + fmtMoney(gap.value) : "€0");
+    document.getElementById("ptGap").className = gap.pts > 0 ? "neg" : "";
     var rx = renewalExposure(arr, state.ren, state.grr);
     set("ptR", fmtPct(rx.share));
     set("ptL", fmtMoney(rx.loss));
