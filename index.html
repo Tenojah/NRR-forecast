@@ -222,6 +222,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
         <div class="pt"><span>Keep 1% more of your ARR<small id="ptGL">1 point of retention (GRR)</small></span><b id="ptG">–</b></div>
         <div class="pt"><span>Sell 1% more to existing customers<small>1 point of expansion</small></span><b id="ptE">–</b></div>
         <div class="pt"><span>ARR you lose each year today<small id="ptGapL">Churn and downgrades</small></span><b class="neg" id="ptGap">–</b></div>
+        <div class="pt"><span>Lost ARR compensated by upsell<small id="ptCovL">Expansion vs churn</small></span><b id="ptCov">–</b></div>
         <div class="pt"><span>ARR up for renewal in 120 days<small>Share of your total ARR</small></span><b id="ptR">–</b></div>
         <div class="pt"><span>Likely loss on those renewals<small>If retention stays at your base GRR</small></span><b id="ptL">–</b></div>
         <div class="say" id="say">–</div>
@@ -396,6 +397,13 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     set("ptGL", grrMaxed ? "Retention is already at the 100% ceiling" : "1 point of retention (GRR)");
     set("ptE", "+" + fmtMoney(pv));
     var gap = gapToCeiling(arr, state.grr);
+    if (b.churn > 0) {
+      set("ptCov", Math.round(b.expansion / b.churn * 100) + "%");
+      set("ptCovL", fmtMoney(b.expansion) + " of upsell against " + fmtMoney(b.churn) + " lost" + (b.expansion >= b.churn ? ": fully covered" : ": not covered"));
+    } else {
+      set("ptCov", "n/a");
+      set("ptCovL", "No ARR lost, nothing to compensate");
+    }
     set("ptGapL", gap.pts > 0 ? "Churn and downgrades: " + gap.pts + " points below 100% retention" : "Churn and downgrades: none, retention is at 100%");
     set("ptGap", gap.pts > 0 ? MINUS + fmtMoney(gap.value) : "€0");
     document.getElementById("ptGap").className = gap.pts > 0 ? "neg" : "";
