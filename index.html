@@ -89,6 +89,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 .pt{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .pt span{font-size:14px}
 .pt b{font-family:'Space Grotesk','Inter',sans-serif;font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pt b.neg{color:var(--red)}
 .pt:last-of-type{border-bottom:0}
 .say{background:var(--black);color:#FFFFFF;border-radius:10px;padding:14px 16px;font-size:14px;line-height:1.5;margin-top:10px}
 .say b{color:var(--gold)}
@@ -216,6 +217,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
       <div class="card">
         <h2>What one point is worth</h2>
         <div class="pt"><span>+1 pt of GRR</span><b id="ptG">–</b></div>
+        <div class="pt"><span id="ptGapL">GRR gap to 100%</span><b class="neg" id="ptGap">–</b></div>
         <div class="pt"><span>+1 pt of expansion</span><b id="ptE">–</b></div>
         <div class="pt"><span>Share of ARR renewing within 120 days</span><b id="ptR">–</b></div>
         <div class="pt"><span>Expected loss on those renewals at base GRR</span><b id="ptL">–</b></div>
@@ -321,10 +323,16 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     return { share: arr > 0 ? r / arr * 100 : 0, loss: r * (100 - clamp(grr, 0, 100)) / 100 };
   }
 
+  // Points of GRR missing to reach the 100% ceiling, and what they are worth in ARR.
+  function gapToCeiling(arr, grr) {
+    var pts = Math.max(0, 100 - clamp(grr, 0, 100));
+    return { pts: pts, value: arr * pts / 100 };
+  }
+
   var api = {
     DEFAULTS: DEFAULTS, parseAmount: parseAmount, scenario: scenario, scenarios: scenarios,
     fmtMoney: fmtMoney, fmtSigned: fmtSigned, fmtPct: fmtPct, fmtInput: fmtInput,
-    pointValue: pointValue, renewalExposure: renewalExposure, clamp: clamp
+    pointValue: pointValue, renewalExposure: renewalExposure, gapToCeiling: gapToCeiling, clamp: clamp
   };
 
   if (typeof module !== "undefined" && module.exports) { module.exports = api; }
@@ -383,6 +391,9 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     var grrMaxed = state.grr >= 100;
     set("ptG", grrMaxed ? "Already 100%" : "+" + fmtMoney(pv));
     set("ptE", "+" + fmtMoney(pv));
+    var gap = gapToCeiling(arr, state.grr);
+    set("ptGapL", gap.pts > 0 ? "GRR gap to 100% (" + gap.pts + " pts)" : "GRR gap to 100%");
+    set("ptGap", gap.pts > 0 ? MINUS + fmtMoney(gap.value) : "None");
     var rx = renewalExposure(arr, state.ren, state.grr);
     set("ptR", fmtPct(rx.share));
     set("ptL", fmtMoney(rx.loss));
@@ -405,6 +416,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
       "Base: NRR " + fmtPct(b.nrr) + ", ARR " + fmtMoney(b.end) + " (" + fmtSigned(b.delta) + "). " +
       "Prudent: NRR " + fmtPct(sc.prudent.nrr) + ", ARR " + fmtMoney(sc.prudent.end) + ". " +
       "Ambitious: NRR " + fmtPct(sc.ambitious.nrr) + ", ARR " + fmtMoney(sc.ambitious.end) + ". " +
+      (gap.pts > 0 ? "GRR is " + gap.pts + " points below 100%, worth " + fmtMoney(gap.value) + " of ARR. " : "") +
       (grrMaxed
         ? "Retention is at its 100% ceiling; one point of expansion is worth about " + fmtMoney(pv) + " of ARR."
         : "One point of retention is worth about " + fmtMoney(pv) + " of ARR.");
