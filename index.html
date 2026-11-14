@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>NRR Forecast Simulator</title>
 <meta name="description" content="Turn one point of retention or expansion into euros of ARR, across three scenarios. Your numbers stay in your browser.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Space+Grotesk:wght@600;700&amp;display=swap" rel="stylesheet">
 <style>
 :root{
   --red:#DA291C;
@@ -21,13 +18,13 @@
 }
 *{box-sizing:border-box}
 html{color-scheme:light}
-body{margin:0;font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+body{margin:0;font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
 .wrap{max-width:1360px;margin:0 auto;padding:0 16px}
 @media(min-width:720px){.wrap{padding:0 40px}}
 header.band{background:var(--black);color:#FFFFFF;border-bottom:6px solid var(--red);padding:32px 0 28px}
 header.band .row{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:flex-start}
 .eyebrow{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin:0 0 6px}
-h1{font-family:'Space Grotesk','Inter',sans-serif;font-size:clamp(28px,4vw,38px);line-height:1.1;letter-spacing:-.02em;margin:0 0 8px}
+h1{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:clamp(28px,4vw,38px);line-height:1.1;letter-spacing:-.02em;margin:0 0 8px}
 .sub{margin:0;color:#D0D0D0;font-size:15px;max-width:62ch}
 .actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
 .tag{font-size:13px;font-weight:600;color:var(--gold);border:1px solid var(--gold);padding:7px 14px;border-radius:999px}
@@ -44,7 +41,7 @@ dialog.aboutDlg .about{border:0;border-radius:0;margin:0;padding:22px 24px 14px}
 .aboutClose{position:sticky;top:10px;float:right;margin:10px 10px 0 0;z-index:1;width:44px;height:44px;border-radius:8px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:22px;line-height:1;cursor:pointer}
 .aboutClose:hover{filter:brightness(.93)}
 .about{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px 10px;margin:0 0 20px}
-.about h2{font-family:'Space Grotesk','Inter',sans-serif;font-size:26px;letter-spacing:-.01em;margin:0 0 14px}
+.about h2{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:26px;letter-spacing:-.01em;margin:0 0 14px}
 .about h3{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--red);margin:22px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--line)}
 .about p{margin:0 0 10px;font-size:15px}
 .about .ab-lead{font-size:17px;font-weight:600}
@@ -57,7 +54,9 @@ dialog.aboutDlg .about{border:0;border-radius:0;margin:0;padding:22px 24px 14px}
 .howto ol{margin:0 0 18px;padding-left:22px;display:grid;gap:8px;font-size:14px;color:var(--muted)}
 .howto li b{color:var(--ink)}
 #msg{min-height:22px;font-size:14px;margin:0 0 12px;font-weight:600}
-#msg.err{color:var(--red)}
+#msg.err{color:#B32015}
+.sumbox[hidden]{display:none}
+.sumbox{display:block;width:100%;margin:0 0 12px;padding:10px 12px;font:inherit;font-size:14px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink)}
 #msg.ok{color:var(--ink)}
 .layout{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
 aside.panel{flex:0 0 340px;max-width:100%;width:100%}
@@ -78,7 +77,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 .sc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;flex-direction:column;gap:4px}
 .sc.base{border:3px solid var(--red);padding:16px 18px}
 .sc .n{font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
-.sc .big{font-family:'Space Grotesk','Inter',sans-serif;font-size:36px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.sc .big{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:36px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .sc .mix{font-size:13px;color:var(--muted)}
 .sc .arr{font-size:14px;margin-top:6px}
 .sc .arr b{font-variant-numeric:tabular-nums}
@@ -103,7 +102,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 .cats div{font-size:13px;color:var(--muted)}
 .pt{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
 .pt span{font-size:14px}
-.pt b{font-family:'Space Grotesk','Inter',sans-serif;font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pt b{font-family:system-ui,-apple-system,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;font-size:20px;font-variant-numeric:tabular-nums;white-space:nowrap}
 .pt b.neg{color:var(--red)}
 .pt b.pos{color:#1B7F3B}
 .pt span small{display:block;font-size:12px;opacity:.65;margin-top:2px}
@@ -166,6 +165,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 </details>
 
 <p id="msg" role="status" aria-live="polite"></p>
+<textarea id="sumBox" class="sumbox" readonly hidden aria-label="Summary to copy" rows="5"></textarea>
 
 <div class="layout">
   <aside class="panel">
@@ -288,7 +288,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
   // Accepts "4,800,000", "4 800 000", "4.8M", "4,8M", "4800k", "4.800.000", "EUR 1 350 000".
   function parseAmount(raw) {
     var s = String(raw === null || raw === undefined ? "" : raw).trim().toLowerCase();
-    s = s.replace(/[€\s_]/g, "").replace(/^eur/, "");
+    s = s.replace(/[€\s_]/g, "").replace(/^eur|eur$/, "");
     if (s === "") return NaN;
     var mult = 1;
     var last = s.charAt(s.length - 1);
@@ -298,8 +298,14 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     var commas = (s.match(/,/g) || []).length;
     var dots = (s.match(/\./g) || []).length;
     if (hasSuffix) {
-      if (commas === 1 && dots === 0) s = s.replace(",", ".");
+      // 4,8M and 1.5k are decimals; 4,800k and 1.234k (exactly 3 digits after one separator) are thousands.
+      if (/^[1-9]\d{0,2}[.,]\d{3}$/.test(s)) s = s.replace(/[.,]/, "");
+      else if (commas === 1 && dots === 0) s = s.replace(",", ".");
       else s = s.replace(/,/g, "");
+    } else if (/^\d{1,3}(\.\d{3})*,\d{1,2}$/.test(s) && dots > 0) {
+      s = s.replace(/\./g, "").replace(",", ".");
+    } else if (/^\d{4,},\d{1,2}$/.test(s)) {
+      s = s.replace(",", ".");
     } else if (commas > 0 && dots === 0) {
       if (/^\d{1,3}(,\d{3})+$/.test(s)) s = s.replace(/,/g, "");
     } else if (commas > 0 && dots === 1) {
@@ -337,9 +343,9 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 
   function fmtMoney(v) {
     var a = Math.abs(v), s;
-    if (a >= 1000000) s = "€" + (a / 1000000).toFixed(2) + "M";
-    else if (a >= 10000) s = "€" + Math.round(a / 1000) + "k";
-    else if (a >= 1000) s = "€" + (a / 1000).toFixed(1) + "k";
+    if (a >= 999500) s = "€" + (a / 1000000).toFixed(2) + "M";
+    else if (a >= 9950) s = "€" + Math.round(a / 1000) + "k";
+    else if (a >= 999.5) s = "€" + (a / 1000).toFixed(1) + "k";
     else s = "€" + Math.round(a);
     return (v < 0 && Math.round(a) > 0 ? MINUS : "") + s;
   }
@@ -396,7 +402,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
     set(prefix + "Arr", fmtMoney(sc.end));
     var d = $(prefix + "D");
     d.textContent = fmtSigned(sc.delta) + " vs start";
-    d.className = "d " + (sc.delta < -500 ? "neg" : "pos");
+    d.className = "d " + (Math.round(sc.delta) < 0 ? "neg" : "pos");
   }
 
   function bar(id, bottomPct, heightPct) {
@@ -443,7 +449,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
       document.getElementById("ptCov").className = "";
       set("ptCovL", "No ARR lost, nothing to compensate");
     }
-    set("ptGapL", gap.pts > 0 ? "Churn and downgrades: " + gap.pts + " points below 100% retention" : "Churn and downgrades: none, retention is at 100%");
+    set("ptGapL", gap.pts > 0 ? "Churn and downgrades: " + gap.pts + (gap.pts === 1 ? " point" : " points") + " below 100% retention" : "Churn and downgrades: none, retention is at 100%");
     set("ptGap", gap.pts > 0 ? MINUS + fmtMoney(gap.value) : "€0");
     document.getElementById("ptGap").className = gap.pts > 0 ? "neg" : "";
     var rx = renewalExposure(arr, state.ren, state.grr);
@@ -468,7 +474,9 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
       "Base: NRR " + fmtPct(b.nrr) + ", ARR " + fmtMoney(b.end) + " (" + fmtSigned(b.delta) + "). " +
       "Prudent: NRR " + fmtPct(sc.prudent.nrr) + ", ARR " + fmtMoney(sc.prudent.end) + ". " +
       "Ambitious: NRR " + fmtPct(sc.ambitious.nrr) + ", ARR " + fmtMoney(sc.ambitious.end) + ". " +
-      (gap.pts > 0 ? "GRR is " + gap.pts + " points below 100%, worth " + fmtMoney(gap.value) + " of ARR. " : "") +
+      (gap.pts > 0 ? "GRR is " + gap.pts + (gap.pts === 1 ? " point" : " points") + " below 100%, worth " + fmtMoney(gap.value) + " of ARR. " : "") +
+      (b.churn > 0 ? "Upsell covers " + Math.round(b.expansion / b.churn * 100) + "% of the ARR lost to churn (net " + fmtSigned(b.expansion - b.churn) + "). " : "") +
+      "Renewals within 120 days: " + $("ptR").textContent + " of ARR, likely loss " + $("ptL").textContent + ". " +
       (grrMaxed
         ? "Retention is at its 100% ceiling; one point of expansion is worth about " + fmtMoney(pv) + " of ARR."
         : "One point of retention is worth about " + fmtMoney(pv) + " of ARR.");
@@ -476,17 +484,23 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 
   function readInputs(showOk) {
     var arr = parseAmount($("arr").value);
+    var gv = Number($("grr").value), ev = Number($("exp").value);
+    set("grrV", gv + "%");
+    set("expV", ev + "%");
+    $("grr").setAttribute("aria-valuetext", gv + "%");
+    $("exp").setAttribute("aria-valuetext", ev + "%");
     if (!(arr > 0)) {
       setMsg("Enter a starting ARR above zero, for example 4.8M.", "err");
       return false;
     }
     var renRaw = $("ren").value;
     var ren = parseAmount(renRaw);
-    var note = "";
+    var notes = [];
     if (String(renRaw).trim() === "") { ren = 0; }
-    else if (isNaN(ren)) { ren = 0; note = "Renewing ARR not understood: counted as zero."; }
-    else if (ren > arr) { ren = arr; note = "Renewing ARR cannot exceed total ARR: capped."; }
-    if (arr < 1000) note = "Starting ARR is under €1,000. Amounts are in euros: type 4.8M or 4800000 for €4.8M.";
+    else if (isNaN(ren)) { ren = 0; notes.push("Renewing ARR not understood: counted as zero."); }
+    else if (ren > arr) { ren = arr; notes.push("Renewing ARR cannot exceed total ARR: capped."); }
+    if (arr < 1000) notes.push("Starting ARR is under €1,000. Amounts are in euros: type 4.8M or 4800000 for €4.8M.");
+    var note = notes.join(" ");
     state.arr = arr;
     state.ren = ren;
     state.grr = Number($("grr").value);
@@ -509,8 +523,12 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 
   function copySummary() {
     if (!lastSummary) return;
-    var done = function () { setMsg("Summary copied to the clipboard.", "ok"); };
-    var fail = function () { setMsg("Copy is not available in this browser: select the text from the page instead.", "err"); };
+    var box = $("sumBox");
+    var done = function () { box.hidden = true; setMsg("Summary copied to the clipboard.", "ok"); };
+    var fail = function () {
+      box.value = lastSummary; box.hidden = false; box.focus(); box.select();
+      setMsg("Copy is not available in this browser: the summary is selected below, press Ctrl+C.", "err");
+    };
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(lastSummary).then(done, fail);
@@ -539,6 +557,7 @@ section.results{flex:1 1 560px;min-width:0;display:flex;flex-direction:column;ga
 })(this);
 
 (function () {
+  if (typeof document === "undefined") return;
   var dlg = document.getElementById("aboutDlg"), btn = document.getElementById("aboutBtn");
   if (!dlg || !btn || typeof dlg.showModal !== "function") return;
   btn.addEventListener("click", function () { dlg.showModal(); });
